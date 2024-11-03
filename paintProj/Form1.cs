@@ -8,7 +8,7 @@ namespace paintProj
     public partial class Form1 : Form
     {
         Bitmap bitmap, bimapClone;
-        enum Tools { none, line, circle, elipse };
+        enum Tools { none, line, circle, elipse,flooFill };
         Tools tool = Tools.none;
         int x0, y0;
         float r;
@@ -75,11 +75,16 @@ namespace paintProj
         //момент нажатия
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (tool != Tools.none)
+            if (tool != Tools.none && tool!=Tools.flooFill)
             {
-                x0 = e.X;
-                y0 = e.Y;
-                mouseDown = true;
+                x0 = e.X;y0 = e.Y;mouseDown = true;
+            }
+            if (tool == Tools.flooFill)
+            {
+                int x = e.X, y= e.Y;
+                Color innerColor = bitmap.GetPixel(x, y);
+                MyGraphics.myfloodFill(x, y, bitmap, Color.Red, innerColor);
+                pictureBox1.Image = bitmap;
             }
         }
 
@@ -98,11 +103,15 @@ namespace paintProj
                         break;
                     case Tools.circle:
                         r = (float)Math.Sqrt((e.X - x0) * (e.X - x0) + (e.Y - y0) + (e.Y - y0));
-                        MyGraphics.MyRadiuscircle(x0, y0, r, istart, istop, bitmap, pictureBox1, color);
+                        //    MyGraphics.MyRadiuscircle(x0, y0, r, istart, istop, bitmap, pictureBox1, color);
+                        MyGraphics.MyCrircle(x0, y0, r, bitmap, pictureBox1, color);
+
                         break;
                
                     case Tools.elipse:
-                        MyGraphics.myElipse(x0, y0, e.X, e.Y, bitmap, pictureBox1, color);
+                        //  MyGraphics.myElipse(x0, y0, e.X, e.Y, bitmap, pictureBox1, color);
+                        int a = Math.Abs(e.X - x0); int b = Math.Abs(e.Y - y0);
+                        MyGraphics.myElipse(x0, y0, a, b, bitmap, pictureBox1, color);
                         break;
                 }
                 bitmap = bimapClone;
@@ -127,10 +136,13 @@ namespace paintProj
                         break;
                     case Tools.circle:
                         r = (float)Math.Sqrt((e.X - x0) * (e.X - x0) + (e.Y - y0) + (e.Y - y0));
-                        MyGraphics.MyRadiuscircle(x0, y0, r, istart, istop, bitmap, pictureBox1, color);
+                        //  MyGraphics.MyRadiuscircle(x0, y0, r, istart, istop, bitmap, pictureBox1, color);
+                        MyGraphics.MyCrircle(x0, y0, r, bitmap, pictureBox1, color);
                         break;
                     case Tools.elipse:
-                        MyGraphics.myElipse(x0, y0, e.X, e.Y, bitmap, pictureBox1, color);
+                        //    MyGraphics.myElipse(x0, y0, e.X, e.Y, bitmap, pictureBox1, color);
+                        int a = Math.Abs(e.X - x0); int b = Math.Abs(e.Y - y0);
+                        MyGraphics.myElipse(x0, y0, a, b, bitmap, pictureBox1, color);
                         break;
                 }
                 mouseDown = false;
@@ -139,7 +151,11 @@ namespace paintProj
         }
 
         private void btnCircle_Click(object sender, EventArgs e) => tool = Tools.circle;
-         
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            tool = Tools.flooFill;
+        }
 
         private void btnElipse_Click(object sender, EventArgs e) => tool = Tools.elipse;
         

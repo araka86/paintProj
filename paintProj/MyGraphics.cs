@@ -96,48 +96,89 @@ namespace paintProj
 
 
 
-        public static void MyRadiuscircle(int x0, int y0, float r, int istart, int istop, Bitmap bitmap, PictureBox pictureBox, Color color)
+        //public static void MyRadiuscircle(int x0, int y0, float r, int istart, int istop, Bitmap bitmap, PictureBox pictureBox, Color color)
+        //{
+        //    int width = bitmap.Width;
+        //    int height = bitmap.Height;
+
+        //    for (int i = istart; i < istop; i++)
+        //    {
+        //        int xi = (int)(x0 + r * Math.Cos(i * Math.PI / 180));
+        //        int yi = (int)(y0 + r * Math.Sin(i * Math.PI / 180));
+
+        //        if (IsValidCoordinate(xi, yi, width, height))
+        //            bitmap.SetPixel(xi, yi, color);
+        //    }
+
+        //    pictureBox.Image = bitmap;
+        //}
+
+
+        public static void MyCrircle(int x0, int y0, float r, Bitmap bitmap, PictureBox pictureBox, Color color)
         {
-            int width = bitmap.Width;
-            int height = bitmap.Height;
 
-            for (int i = istart; i < istop; i++)
+            int xi, yi, iteration = (int)(4 * Math.PI * r);
+            int width = bitmap.Width - 1;
+            int height = bitmap.Height - 1;
+            for (int i = 0; i < iteration; i++)
             {
-                int xi = (int)(x0 + r * Math.Cos(i * Math.PI / 180));
-                int yi = (int)(y0 + r * Math.Sin(i * Math.PI / 180));
-
-                if (IsValidCoordinate(xi, yi, width, height))
+                xi = (int)(x0 + r * Math.Cos(i * Math.PI / (4 * r)));
+                yi = (int)(y0 + r * Math.Sin(i * Math.PI / (4 * r)));
+                if ((xi > 1) && (xi < width) && (yi > 1) && (yi < height))
                     bitmap.SetPixel(xi, yi, color);
             }
-
             pictureBox.Image = bitmap;
+
+
         }
 
 
 
 
-        public static void myElipse(int x0, int y0, int x1, int y1, Bitmap bitmap, PictureBox pictureBox, Color color)
+
+        //public static void myElipse(int x0, int y0, int x1, int y1, Bitmap bitmap, PictureBox pictureBox, Color color)
+        //{
+        //    int width = bitmap.Width - 1;
+        //    int height = bitmap.Height - 1;
+
+        //    // Вычисляем радиусы на основе координат начальной и конечной точки
+        //    int a = Math.Abs(x1 - x0) / 2; // Горизонтальный радиус
+        //    int b = Math.Abs(y1 - y0) / 2; // Вертикальный радиус
+
+        //    // Вычисляем центр эллипса
+        //    int centerX = x0 + (x1 - x0) / 2;
+        //    int centerY = y0 + (y1 - y0) / 2;
+
+        //    int iteration = 360;
+
+        //    for (int i = 0; i < iteration; i++)
+        //    {
+        //        // Вычисляем координаты на границе эллипса
+        //        int xi = (int)(centerX + a * Math.Cos(i * Math.PI / 180)); // Используем 180 для градусов
+        //        int yi = (int)(centerY + b * Math.Sin(i * Math.PI / 180));
+
+        //        if (IsValidCoordinate(xi, yi, width, height))
+        //            bitmap.SetPixel(xi, yi, color);
+        //    }
+
+        //    // Обновляем изображение в PictureBox
+        //    pictureBox.Image = bitmap;
+        //}
+
+
+
+        public static void myElipse(int x0, int y0, int a, int b, Bitmap bitmap, PictureBox pictureBox, Color color)
         {
+            int max = Math.Max(a, b);
+            int xi, yi, iteration = (int)(4 * Math.PI * max);
+
             int width = bitmap.Width - 1;
             int height = bitmap.Height - 1;
-
-            // Вычисляем радиусы на основе координат начальной и конечной точки
-            int a = Math.Abs(x1 - x0) / 2; // Горизонтальный радиус
-            int b = Math.Abs(y1 - y0) / 2; // Вертикальный радиус
-
-            // Вычисляем центр эллипса
-            int centerX = x0 + (x1 - x0) / 2;
-            int centerY = y0 + (y1 - y0) / 2;
-
-            int iteration = 360;
-
             for (int i = 0; i < iteration; i++)
             {
-                // Вычисляем координаты на границе эллипса
-                int xi = (int)(centerX + a * Math.Cos(i * Math.PI / 180)); // Используем 180 для градусов
-                int yi = (int)(centerY + b * Math.Sin(i * Math.PI / 180));
-
-                if (IsValidCoordinate(xi, yi, width, height))
+                xi = (int)(x0 + a * Math.Cos(i * Math.PI / (4 * max)));
+                yi = (int)(y0 + b * Math.Sin(i * Math.PI / (4 * max)));
+                if ((xi > 1) && (xi < width) && (yi > 1) && (yi < height))
                     bitmap.SetPixel(xi, yi, color);
             }
 
@@ -145,15 +186,32 @@ namespace paintProj
             pictureBox.Image = bitmap;
         }
 
+        public static void myfloodFill(int x, int y, Bitmap bitmap, Color fillColor, Color innerColor)
+        {
+
+            if (x > 1 && x < bitmap.Width && y > 1 && y < bitmap.Height)
+            {
+                if (bitmap.GetPixel(x, y) == innerColor) bitmap.SetPixel(x, y, fillColor);
+                else return;
+
+                myfloodFill(x - 1, y, bitmap, fillColor, innerColor);
+                myfloodFill(x, y - 1, bitmap, fillColor, innerColor);
+                myfloodFill(x, y + 1, bitmap, fillColor, innerColor);
+                myfloodFill(x + 1, y, bitmap, fillColor, innerColor);
+            }
+
+
+        }
 
 
 
-   
+
+
 
         // Метод для проверки, находятся ли координаты в пределах изображения
         private static bool IsValidCoordinate(int x, int y, int width, int height) =>
             x >= 0 && x < width && y >= 0 && y < height;
-        
+
 
 
     }
